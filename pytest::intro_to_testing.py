@@ -276,3 +276,104 @@ def test_agg_feature(get_df):
     assert aggregated.shape[0] > 0
     # Test the data type of the aggregated
     assert aggregated.dtype in (int, float)
+
+
+
+
+import pandas as pd
+import pytest
+
+# Fixture to read the dataframe
+@pytest.fixture
+def get_df():
+    return pd.read_csv('https://assets.datacamp.com/production/repositories/6253/datasets/757c6cb769f7effc5f5496050ea4d73e4586c2dd/laptops_train.csv')
+
+# Integration test function
+def test_get_df(get_df):
+    # Check the type
+    assert type(get_df) == pd.DataFrame
+    # Check the number of rows
+    assert get_df.shape[0] > 0
+
+    
+
+"""  
+Finding an element
+Using the right data structure can significantly increase the performance of your code. 
+For example, if you want to find a certain element in the data, you might want to choose between list and set.
+In this exercise, you will implement performance tests with pytest to compare the speed of the in operator applied 
+correspondingly to the two data structures: list and set. 
+
+Instructions
+Pass benchmark as an argument into the test functions.
+Then call benchmark() in the test functions passing find() as the first argument.
+"""
+
+def create_list():
+    return [i for i in range(1000)]
+def create_set():
+    return set([i for i in range(1000)])
+def find(it, el=50):
+    return el in it
+
+# Write the performance test for a list
+def test_list(benchmark):
+    benchmark(find, it=create_list())
+    
+# Write the performance test for a set
+def test_set(benchmark):
+    benchmark(find, it=create_set())
+
+
+
+
+
+"""
+Speed of loops
+Of course, set is better suited for searching elements. 
+It is based on hashes, so you can expect constant complexity most of the time. 
+But what about iterating over all the object's elements? 
+Let's compare the speed of loop iteration over the elements of list and set with pytest and pytest-benchmark. 
+The pytest package has already been imported.
+
+Instructions
+Add @benchmark decorator before the functions starting with iterate_.
+Complete the loops in iterate_list and iterate_set.
+"""
+def test_list(benchmark):
+	# Add decorator here
+    @benchmark
+    def iterate_list():
+		# Complete the loop here
+        for el in [i for i in range(1000)]:
+            pass
+
+def test_set(benchmark):
+	# Add decorator here
+    @benchmark
+    def iterate_set():
+        # Complete the loop here
+        for el in {i for i in range(1000)}:
+            pass
+
+
+
+#Test assertTrue
+def is_prime(num):
+    if num == 1: return False
+    up_limit = int(math.sqrt(num)) + 1
+    for i in range(2, up_limit):
+        if num % i == 0:
+            return False
+    return True
+
+class TestSuite(unittest.TestCase):
+    def test_is_prime(self):
+        # Check that 17 is prime
+        self.assertTrue(is_prime(17))
+
+#part2
+class TestSuite(unittest.TestCase):
+    def test_is_prime(self):
+        # Check that 6 is not prime
+        self.assertFalse(is_prime(6))

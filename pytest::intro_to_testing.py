@@ -9,6 +9,10 @@
 
 '''
 
+from datetime import datetime
+import math
+
+
 #1.1 first test suite 
 def multiple_of_two(num):
     if num == 0:
@@ -171,7 +175,7 @@ def add_numbers_to_list(init_list):
 # Complete the tests
 def test_elements(init_list):
     assert 1 in init_list 
-    assert 9 in init_lists
+    assert 9 in init_list
 
 
 
@@ -452,3 +456,134 @@ class TestPalindrome(unittest.TestCase):
 
 #python3 -m unittest palindrome_check.py
 
+
+
+
+
+
+#start
+#Practical example
+import os
+
+
+def filter_df(df):
+    return df[df["employment_type"] == "FT"]
+
+
+def get_mean(df):
+    return float(df["salary_in_usd"].mean())
+
+
+# Integration tests
+def test_filtered_df_has_rows(read_df):
+    #check the type of the dataframe
+    assert isinstance(read_df, pd.DataFrame)
+
+    #check that the df contains rows
+    assert read_df.shape[0] > 0
+
+
+def test_write(tmp_path):
+    temp_file = tmp_path / "temp.txt"
+    temp_file.write_text("12345")
+    assert temp_file.exists()
+
+
+#Unit tests
+def test_units(read_df):
+    filtered = filter_df(read_df)
+    assert filtered["employment_type"].unique().tolist() == ["FT"]
+    assert isinstance(get_mean(filtered), float)
+
+
+#Feature tests
+def test_feature(read_df):
+    #filtering the data
+    filtered = filter_df(read_df)
+    #test case: mean is greater than 0
+    assert get_mean(filtered) > 0
+    #test case: mean is not bigger than the maximum
+    assert get_mean(filtered) <= read_df["salary_in_usd"].max()
+
+
+# Performance tests
+def test_performance(benchmark, read_df):
+    def pipeline():
+        filtered = filter_df(read_df)
+        return get_mean(filtered)
+
+    benchmark(pipeline)
+
+#End
+
+
+
+
+
+import pytest
+import pandas as pd
+
+DF_PATH = "/usr/local/share/salaries.csv"
+@pytest.fixture
+def read_df():
+    return pd.read_csv(DF_PATH)
+
+def get_grouped(df):
+    return df.groupby('work_year').agg({'salary': 'describe'})['salary']
+
+def test_salary_df_read(read_df):
+    # Check the type of the dataframe
+    assert isinstance(read_df, pd.DataFrame)
+    # Check that df contains rows
+    assert read_df.shape[0] > 0
+
+def test_grouped(read_df):
+    df = read_df
+    salary_by_year = get_grouped(df)
+    # Check the nulls here
+    assert salary_by_year.isna().sum().sum() == 0
+def test_feature_2022(read_df):
+    salary_by_year = get_grouped(read_df)
+    salary_2022 = salary_by_year.loc[2022, '50%']
+    # Check the median type here
+    assert isinstance(salary_2022, float)
+    # Check the median is greater than zero
+    assert 0 < salary_2022
+
+# Use benchmark here
+def test_reading_speed(benchmark):
+    benchmark(pd.read_csv, DF_PATH)
+
+
+
+
+
+
+
+import unittest
+import pandas as pd
+DF_PATH = 'https://assets.datacamp.com/production/repositories/6253/datasets/f015ac99df614ada3ef5e011c168054ca369d23b/energy_truncated.csv'
+
+def get_data():
+    return pd.read_csv(DF_PATH)
+
+def min_country(df):
+    return df['VALUE'].idxmin()
+
+class TestDF(unittest.TestCase):
+    def setUp(self):
+        self.df = get_data()
+        self.df.drop('previousYearToDate', axis=1, inplace=True)
+        self.df = self.df.groupby('COUNTRY')\
+            .agg({'VALUE': 'sum'})
+
+    def test_NAs(self):
+        # Check the number of nulls
+        self.assertEqual(self.df.isna().sum().sum(), 0)
+
+    def test_argmax(self):
+        # Check that min_country returns a string
+        self.assertIsInstance(min_country(self.df), str)
+
+    def tearDown(self):
+        self.df.drop(self.df.index, inplace=True)

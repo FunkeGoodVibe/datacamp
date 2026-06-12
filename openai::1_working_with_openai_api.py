@@ -60,14 +60,53 @@ print(response.choices[0].message.content)
 
 #activity 5: Calculate the cost 
 #define price per token 
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}],
+    max_completion_tokens=max_completion_tokens
+)
+
 input_token_price = 0.15 / 1_000_000
 output_token_price = 0.6 / 1_000_000
 
-input_tokens = response.usage.input_tokens
+# Extract token usage
+input_tokens = response.usage.prompt_tokens
 output_tokens = max_completion_tokens
-
-#Calculate cost 
-cost = (input_tokens * input_token_price + output_tokens * output_token_price) 
+# Calculate cost
+cost = (input_tokens * input_token_price + output_tokens * output_token_price)
 print(f"Estimated cost: ${cost}")
-
 """Output: Estimated cost: $0.00124"""
+
+
+#activity 6: controlling randomness in the response
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "user", "content": prompt}],
+    max_completion_tokens=max_completion_tokens
+    temperature=2 #0=deterministic, 2=more random
+)
+print(response.choices[0].message.content)
+#response.choices[0].messages.content 
+
+
+#activity 7: chat roles 
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    messages=[{"role": "system",
+            "content": "You are a python programming tutor who speaking consisely."},
+              {"role": "user", 
+            "content": "What is the difference between mutable and ?"}]
+)
+print(response.choices[0].message.content)
+
+
+sys_msg = """
+    You are finance education assistnat that helps students study for exams.
+
+    If you are asked for specific, real-world financial advice with risk to their finances, response with:
+
+    I'm sorry, I am not allowed to provide financial advice
+"""
+

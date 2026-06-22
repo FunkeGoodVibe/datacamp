@@ -110,3 +110,39 @@ sys_msg = """
     I'm sorry, I am not allowed to provide financial advice
 """
 
+
+#activity 8: assistan 
+client = OpenAI(api_key="<OPENAI_API_TOKEN>")
+
+response = client.chat.completions.create(
+    model="gpt-4o-mini",
+    # Add a user and assistant message for in-context learning
+    messages=[
+        {"role": "system", "content": "You are a helpful Geography tutor that generates concise summaries for different countries."},
+        {"role": "user", "content": "Give me a quick summary of Portugal."},
+        {"role": "assistant", "content": "Portugal is a country in Europe that borders Spain. The capital city is Lisboa."},
+        {"role": "user", "content": "Give me a quick summary of Greece."}
+    ]
+)
+
+print(response.choices[0].message.content)
+
+
+#activity 9: coding a conversation 
+messages = [{"role: system", 
+            "content": "You are a data science tutor who provides short, simple explanations."}]
+
+user_qs = ["Why is Python so popular?"]
+
+for q in user_qs: 
+
+    user_dict = {"role":"user", "content": q}
+    messages.append(user_dict)
+
+    response = client.chat.completions.create(
+        model = "gpt-4o-mini",
+        messages = messages
+    )
+
+    assistant_dict = {"role":"assistant", "content":response.choices[0].message.content}
+    messages.append(assistant_dict)

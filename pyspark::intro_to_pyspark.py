@@ -191,7 +191,9 @@ What is parralisation in pyspark?
 - automatically parralising data and computations across mulitple nodes in a cluster
 - distributed processing of large datasets across multiple nodes 
 - worker nodes process data in parallel, combining at the end of a task 
-- faster processing at scale (think gb or tb)
+- faster processing at scale (think gb or tb's)
+
+- immutable and can be transformed using ops like map() or filter() with actions like collect() or paralelise() to retrieve results or create RDDs
 """
 
 #1.21 - creating an rdd (resilient distributed datasets)
@@ -202,3 +204,29 @@ census_df = spark.read.csv("/census.csv") #create a df drom a csv
 
 census_rdd = sensus_df.rdd #covert df to rdd 
 census_rdd.collect() #show the rdd's content using collect 
+
+#1.22 - showing collect 
+data_collected = df.collect()
+for row in data_collected: 
+    print(row)
+
+
+"""
+DATAFRAMES: 
+- high-level : optimised for ease of use 
+- sql like operations: work with sql-like queries and perform complex operations with less code 
+- schema information: contain columns and types like a sql table 
+
+RESILIENT DISTRIBUTED DATASETS:
+- low-level: more flexible but requiring more lines of code for complex operations 
+- type safety: preserve data types but don't have the opistimisation benefits of DataFrames. 
+- no schema: harder to work with srtuctured data like SQL or relational data 
+- large scaling
+- very very verbose compared to dataframe and poor at analytics
+
+"""
+# 1.21 - activity 
+df = spark.read.csv("salaries.csv", header=True, inferSchema=True)
+rdd = df.rdd # Convert DataFrame to RDD
+rdd.collect() # Show the RDD's contents
+print(rdd)

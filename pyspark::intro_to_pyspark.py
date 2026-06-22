@@ -22,13 +22,13 @@ census_df = spark.read.csv("path/to/census.csv", header=True, inferSchema=True)
 #1.4 Show schema 
 .showSchema() 
 
-#1.5 GroupBy
+#1.5 Groupby
 row_count = census_df.count()
 print(f"Number of rows in the DataFrame: {row_count}")  
 
-#1.6 GroupBy and Count
-census_df.groupBy("gender").count().show()
-census_df.groupBy("gender").agg({"salary_usd":"avg"}).show()
+#1.6 Groupby and Count
+census_df.groupby("gender").count().show()
+census_df.groupby("gender").agg({"salary_usd":"avg"}).show()
 
 
 #.sum() 
@@ -55,7 +55,7 @@ salaries_df = spark.read.csv("salaries.csv", header=True, inferSchema=True)
 row_count = salaries_df.count()
 print(f"Total rows: {row_count}")
 
-salaries_df.groupBy("company_size").agg({"salary_in_usd": "avg"}).show() # Group by company size and calculate the average of salaries
+salaries_df.groupby("company_size").agg({"salary_in_usd": "avg"}).show() # Group by company size and calculate the average of salaries
 salaries_df.show()
 
 
@@ -63,11 +63,11 @@ salaries_df.show()
 # 1.9 Filtering by company 
 # Average salary for entry level in Canada
 CA_jobs = ca_salaries_df.filter(ca_salaries_df["company_location"] == "CA").filter(ca_salaries_df['experience_level']
- == "EN").groupBy().avg("salary_in_usd")
+ == "EN").groupby().avg("salary_in_usd")
 
 CS_jobs = df.filter(df["location"]=="EN")\
             .filter(df["experience">5])\
-            .groupBy().avg("salary_in_usd")
+            .groupby().avg("salary_in_usd")
 CA_jobs.show()
 
 #1.10 - CSV files - delimited data. 
@@ -103,8 +103,8 @@ census_df_weekly.show() # Show the result
 
 #1.14 row operations 
 filtered_df = df.filter(df["salary"] > 50000) #filter rows based on a condition
-grouped_avg_df = df.groupBy("department").avg({"salary", "age"}) #group rows and calculate average salary
-grouped_sum_df = df.groupBy("department").sum({"salary"}) #group rows and calculate sum salary
+grouped_avg_df = df.groupby("department").avg({"salary", "age"}) #group rows and calculate average salary
+grouped_sum_df = df.groupby("department").sum({"salary"}) #group rows and calculate sum salary
 
 
 
@@ -158,7 +158,7 @@ def to_uppercase(s):
 
 to_uppercase_udf = udf(to_uppercase, StringType()) #register the function
 
-df = df.withColumn("name_upper#Apply the UDF to the DataFrame 
+df = df.withColumn("name_upper#Apply the UDF to the DataFrame")
 
 
 #1.19 udf activity 
@@ -230,3 +230,32 @@ df = spark.read.csv("salaries.csv", header=True, inferSchema=True)
 rdd = df.rdd # Convert DataFrame to RDD
 rdd.collect() # Show the RDD's contents
 print(rdd)
+
+
+#1.22 - activity 
+"""
+Create an RDD from a DataFrame.
+Collect and display the results of the RDD and DataFrame.
+Group by the "experience_level" and calculate the maximum salary for each.
+"""
+rdd_salaries = df_salaries.rdd  # Create an RDD from the df_salaries
+print(rdd_salaries.collect()) # Collect and print the results
+dataframe_results = df_salaries.groupby("experience_level").agg({"salary_in_usd": 'max'}) # Group by the experience level and calculate the maximum salary
+dataframe_results.show() # Show the results 
+
+#1.23 - Spark SQL
+
+spark = SparkSession.builder.appName("Spark SQL Example").getOrCreate()  #init the spark session
+data = [("Alice", "HR", 30), ("Bob", "IT", 40),("Cathy", "HR", 28)]
+columns = ["Name", "Department", "Age"]
+
+df = spark.createDataFrame(data, schema=columns)
+df.createOrReplaceTempView("people") #register df as a temp table 
+
+result = spark.sql("SELECT Name, Age FROM people WHERE Age > 30")
+result.show()
+
+#1.24 Combining SQL and DataFrame operations
+query_result = spark.sql("SELECT Name, Salary FROM employees WHERE Salary > 3000")
+high_earners = query_result.withColumn("Bonus", query_result * 0.1)
+high_earners.show()
